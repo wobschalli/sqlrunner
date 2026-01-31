@@ -12,6 +12,9 @@ if !hwfile || !dbfile
   exit
 end
 
+#parse empty times for q1
+db.run("UPDATE races SET time = NULL WHERE time = CHAR(0)")
+
 queries = `python3 #{hwfile}`.split("\n").map(&:strip).reject(&:empty?)[0..-2] #removes "your submission is valid"
 
 if queries.empty? || queries[0] =~ /invalid/i
@@ -22,7 +25,8 @@ end
 queries.each_with_index do |query, index|
   next if query =~ /Your code/i #if not written skip
 
-  results = db.run(query).all
+  puts "running query: #{query}"
+  results = db.fetch(query).all
   if results.empty?
     puts "empty"
     next

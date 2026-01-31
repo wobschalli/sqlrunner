@@ -20,9 +20,7 @@ instr = '''Instructions:
 
 def query1():
 	return """
-		SELECT *
-		FROM races
-		WHERE year = 1950 
+		SELECT raceId, year, round, circuitId, name, date, url FROM races WHERE year = 1950 
 	"""
 
 def query2():
