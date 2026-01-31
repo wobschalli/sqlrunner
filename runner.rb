@@ -2,6 +2,17 @@ require 'sequel'
 require 'sqlite3'
 require 'terminal-table'
 
+class String
+  def truncate(length)
+    self[0..length].concat(self.length > length ? "..." : "")
+  end
+
+  def multiline(length)
+    return self if self.length < length
+    self[0..length-1].concat("\n#{self[length..-1].multiline(length)}")
+  end
+end
+
 hwfile = ARGV[0]
 dbfile = ARGV[1]
 
@@ -15,7 +26,7 @@ end
 #parse empty times for q1
 db.run("UPDATE races SET time = NULL WHERE time = CHAR(0)")
 
-queries = `python3 #{hwfile}`.split("\n").map(&:strip).reject(&:empty?)[0..-2] #removes "your submission is valid"
+queries = `python3 #{hwfile}`.strip.gsub("\t", "").split("\n\n\n").map{it.gsub("\n", " ")}[0..-2] #removes "your submission is valid"
 
 if queries.empty? || queries[0] =~ /invalid/i
   puts "your queries do not exist or there was an error :("
@@ -25,7 +36,6 @@ end
 queries.each_with_index do |query, index|
   next if query =~ /Your code/i #if not written skip
 
-  puts "running query: #{query}"
   results = db.fetch(query).all
   if results.empty?
     puts "empty"
@@ -36,7 +46,7 @@ queries.each_with_index do |query, index|
   rows = results.map(&:values)
 
   puts Terminal::Table.new(
-    title: "query #{index + 1}\n#{query}",
+    title: "query #{index + 1}\n#{query.multiline(100)}",
     headings: headers,
     rows: rows
   )

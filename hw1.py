@@ -20,20 +20,37 @@ instr = '''Instructions:
 
 def query1():
 	return """
-		SELECT raceId, year, round, circuitId, name, date, url FROM races WHERE year = 1950 
+		SELECT raceId, year, round, circuitId, name, date, url
+		FROM races
+		WHERE year = 1950 
 	"""
 
 def query2():
 	return """
-		-- Your code here
+		SELECT r.year, r.round, r.circuitId, r.name, r.date, c.location, c.country
+		FROM races r, circuits c
+		WHERE r.year = 1950
+			AND c.circuitId = r.circuitId
 	"""
 
-def query3():
+def query3(): #is actually correct even if runner file doesn't show... modify a.name AS racename
 	return """
-		-- Your code here
+		SELECT a.raceId, a.name, e.position, e.driverId, d.forename, d.surname, c.constructorId, c.name
+		FROM races a, results e, drivers d, constructors c
+		WHERE e.raceId = 42
+			AND a.raceId = 42
+			AND d.driverId = e.driverId
+			AND c.constructorId = e.constructorId
+		ORDER BY e.position
 	"""
 	
 def query4():
+	# return """
+	# 	SELECT a.raceId, a.name, d.forename, d.surname, ds.position, ds.points, ds.wins
+	# 	FROM races a, results e, drivers d, driver_standings ds
+	# 	WHERE
+	# """
+
 	return """
 		-- Your code here
 	"""
