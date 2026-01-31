@@ -7,12 +7,19 @@ dbfile = ARGV[1]
 
 db = Sequel.sqlite(dbfile)
 
-queries = `python3 #{hwfile}`.split("\n").map(&:strip).reject(&:empty?).tap{binding.irb}[0..-2] #removes "your submission is valid"
+if !hwfile || !dbfile
+  puts "you need to add the homework file and/or database file"
+  exit
+end
+
+queries = `python3 #{hwfile}`.split("\n").map(&:strip).reject(&:empty?)[0..-2] #removes "your submission is valid"
 
 if queries.empty? || queries[0] =~ /invalid/i
   puts "your queries do not exist or there was an error :("
   exit
 end
+
+binding.irb
 
 queries.each_with_index do |query, index|
   next if query =~ /Your code/i #if not written skip
