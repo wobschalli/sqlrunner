@@ -19,8 +19,6 @@ if queries.empty? || queries[0] =~ /invalid/i
   exit
 end
 
-binding.irb
-
 queries.each_with_index do |query, index|
   next if query =~ /Your code/i #if not written skip
 
