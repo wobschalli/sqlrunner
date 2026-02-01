@@ -26,7 +26,8 @@ end
 #parse empty times for q1
 db.run("UPDATE races SET time = NULL WHERE time = CHAR(0)")
 
-queries = `python3 #{hwfile}`.strip.gsub("\t", "").split("\n\n\n").map{it.gsub("\n", " ")}[0..-2] #removes "your submission is valid"
+queries = `python3 #{hwfile}`.strip.gsub("\t", "").split("\n\n\n").map{it.gsub("\n", " ")}
+queries[-1].gsub!("Your submission is valid.", "").chomp! #remove the valid submission thing
 
 if queries.empty? || queries[0] =~ /invalid/i
   puts "your queries do not exist or there was an error :("
