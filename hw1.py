@@ -157,9 +157,9 @@ def query13():
 
 def query14():
 	return """
-		SELECT DISTINCT r.raceId, COALESCE(COUNT(DISTINCT e.driverId), 0) AS cnt
+		SELECT DISTINCT r.raceId, r.year, r.name, r.date, COALESCE(COUNT(DISTINCT e.driverId), 0) AS cnt
 		FROM
-			(SELECT DISTINCT raceId
+			(SELECT DISTINCT raceId, year, name, date
 			FROM races) AS r
 		LEFT JOIN results e
 		ON r.raceId = e.raceId
