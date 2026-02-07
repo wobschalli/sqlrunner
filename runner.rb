@@ -13,7 +13,7 @@ class String
   end
 
   def to_query
-    return self.gsub("\t", "").gsub("\n", " ").strip
+    self.gsub("\n", " ").gsub("\t", "").gsub(/ {2,}/, " ").gsub("( ", "(").gsub(" )", ")").strip
   end
 end
 
