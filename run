@@ -1,3 +1,0 @@
-#!/bin/bash
-
-ruby runner.rb hw1.py Formula1.sqlite

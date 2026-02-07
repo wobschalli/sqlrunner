@@ -3,13 +3,17 @@ require 'sqlite3'
 require 'terminal-table'
 
 class String
-  def truncate(length)
-    self[0..length].concat(self.length > length ? "..." : "")
+  def truncate(length, last="...")
+    self[0..length].concat(self.length > length ? last : "")
   end
 
   def multiline(length)
     return self if self.length < length
     self[0..length-1].concat("\n#{self[length..-1].multiline(length)}")
+  end
+
+  def to_query
+    return self.gsub("\t", "").gsub("\n", " ").strip
   end
 end
 
@@ -26,8 +30,11 @@ end
 #parse empty times for q1
 db.run("UPDATE races SET time = NULL WHERE time = CHAR(0)")
 
-queries = `python3 #{hwfile}`.strip.gsub("\t", "").split("\n\n\n").map{it.gsub("\n", " ")}
-queries[-1].gsub!("Your submission is valid.", "").chomp! #remove the valid submission thing
+raw = `python3 #{hwfile}`
+queries = raw.split(raw.include?("\n\n\n") ? "\n\n\n" : "=" * 24).keep_if{it.include?("SELECT")}.map{it.to_query}
+if queries[-1].include?("Your submission is valid")
+  queries[-1].gsub!("Your submission is valid.", "").chomp! #remove the valid submission thing
+end
 
 if queries.empty? || queries[0] =~ /invalid/i
   puts "your queries do not exist or there was an error :("
@@ -35,7 +42,7 @@ if queries.empty? || queries[0] =~ /invalid/i
 end
 
 queries.each_with_index do |query, index|
-  next if query =~ /Your code/i #if not written skip
+  next if query =~ /^Your/i || query.empty? #if not written skip
 
   results = db.fetch(query).all
   if results.empty?
@@ -44,7 +51,7 @@ queries.each_with_index do |query, index|
   end
 
   headers = results[0].keys.map(&:to_s)
-  rows = results.map(&:values)
+  rows = results.map(&:values).map{it.map{(+it.to_s).truncate(20)}}
 
   puts Terminal::Table.new(
     title: "query #{index + 1}\n#{query.multiline(100)}",
